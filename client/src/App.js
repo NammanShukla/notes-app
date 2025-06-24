@@ -1,23 +1,50 @@
-import logo from './logo.svg';
-import './App.css';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+
+const API = 'http://localhost:5000/notes';
 
 function App() {
+  const [notes, setNotes] = useState([]);
+  const [text, setText] = useState('');
+
+  const fetchNotes = async () => {
+    const res = await axios.get(API);
+    setNotes(res.data);
+  };
+
+  const addNote = async () => {
+    if (!text) return;
+    await axios.post(API, { text });
+    setText('');
+    fetchNotes();
+  };
+
+  const deleteNote = async (id) => {
+    await axios.delete(`${API}/${id}`);
+    fetchNotes();
+  };
+
+  useEffect(() => {
+    fetchNotes();
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div style={{ padding: '20px' }}>
+      <h2>Notes</h2>
+      <input
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        placeholder="Write a note"
+      />
+      <button onClick={addNote}>Add</button>
+      <ul>
+        {notes.map((note) => (
+          <li key={note._id}>
+            {note.text}
+            <button onClick={() => deleteNote(note._id)}>X</button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
