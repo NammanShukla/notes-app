@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import Header from './components/header';
+import './App.css';
+import {FaTrash} from 'react-icons/fa';
 
 const API = 'http://localhost:5000/notes';
+const stickyColors = ['#fffa65', '#ffb6b6', '#caffbf', '#b5ead7', '#a0c4ff', '#ffd6a5'];
 
 function App() {
   const [notes, setNotes] = useState([]);
@@ -29,22 +33,31 @@ function App() {
   }, []);
 
   return (
-    <div style={{ padding: '20px' }}>
-      <h2>Notes</h2>
-      <input
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        placeholder="Write a note"
-      />
-      <button onClick={addNote}>Add</button>
-      <ul>
-        {notes.map((note) => (
-          <li key={note._id}>
-            {note.text}
-            <button onClick={() => deleteNote(note._id)}>X</button>
-          </li>
+    <div className="app">
+      <Header />
+      <div className="input-container">
+        <textarea
+          className="note-textarea"
+          placeholder="Write your sticky note here..."
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+        />
+        <button onClick={addNote} className="add-button">Add Note</button>
+      </div>
+      <div className="notes-container">
+        {notes.map((note, i) => (
+          <div
+            key={note._id}
+            className="note"
+            style={{ backgroundColor: stickyColors[i % stickyColors.length] }}
+          >
+            <p>{note.text}</p>
+            <button onClick={() => deleteNote(note._id)} className="delete-btn">
+              <FaTrash />
+            </button>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 }
